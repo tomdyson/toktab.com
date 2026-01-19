@@ -737,8 +737,20 @@ function generateIndexPageHTML(modelIndex, buildDate) {
     function filterByProvider(event, provider) {
       event.preventDefault();
       event.stopPropagation();
-      searchInput.value = 'provider:' + provider;
-      search('provider:' + provider, true);
+      // Preserve existing search term when clicking provider pill
+      const currentQuery = searchInput.value.trim();
+      let textPart = '';
+      if (currentQuery.toLowerCase().startsWith('provider:')) {
+        // Extract text after existing provider filter
+        const rest = currentQuery.slice(9);
+        const spaceIdx = rest.indexOf(' ');
+        textPart = spaceIdx === -1 ? '' : rest.slice(spaceIdx + 1).trim();
+      } else {
+        textPart = currentQuery;
+      }
+      const newQuery = textPart ? 'provider:' + provider + ' ' + textPart : 'provider:' + provider;
+      searchInput.value = newQuery;
+      search(newQuery, true);
     }
 
     function updateUrl(query) {
