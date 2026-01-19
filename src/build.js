@@ -47,7 +47,7 @@ function generateDetailPageHTML(modelName, slug, buildDate) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${escapeHtml(modelName)} Pricing - Toktab</title>
-  <meta name="description" content="Current pricing for ${escapeHtml(modelName)} - input tokens, output tokens, and context window. Compare LLM costs across 2000+ models.">
+  <meta name="description" content="Current pricing data for ${escapeHtml(modelName)} - input/output token costs and context window. Free JSON API available.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -493,8 +493,8 @@ function generateIndexPageHTML(modelIndex, buildDate) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Toktab - LLM Pricing Comparison for 2000+ AI Models</title>
-  <meta name="description" content="Compare pricing for 2000+ LLM models including GPT-4, Claude, Gemini, Llama, and more. Search input/output token costs, context windows, and API pricing. Updated daily.">
+  <title>Toktab - Current LLM Pricing Data for 2000+ AI Models</title>
+  <meta name="description" content="Current pricing data for 2000+ LLM models including GPT-4, Claude, Gemini, and Llama. Use the free JSON API to access pricing in your code. Updated daily.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
