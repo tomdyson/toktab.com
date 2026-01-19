@@ -734,18 +734,21 @@ function generateIndexPageHTML(modelIndex, buildDate) {
       return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    // Original/canonical providers - prioritized in search results
-    const priorityProviders = new Set([
+    // Original/canonical providers - prioritized in search results (order matters)
+    const priorityProviders = [
       'anthropic', 'openai', 'gemini', 'vertex_ai', 'vertex_ai_beta',
       'vertex_ai-language-models', 'deepseek', 'mistral', 'xai'
-    ]);
+    ];
 
     function sortByPriority(results) {
       return results.sort((a, b) => {
-        const aPriority = priorityProviders.has(a.provider.toLowerCase());
-        const bPriority = priorityProviders.has(b.provider.toLowerCase());
+        const aIdx = priorityProviders.indexOf(a.provider.toLowerCase());
+        const bIdx = priorityProviders.indexOf(b.provider.toLowerCase());
+        const aPriority = aIdx !== -1;
+        const bPriority = bIdx !== -1;
         if (aPriority && !bPriority) return -1;
         if (!aPriority && bPriority) return 1;
+        if (aPriority && bPriority) return aIdx - bIdx;
         return a.name.localeCompare(b.name);
       });
     }
