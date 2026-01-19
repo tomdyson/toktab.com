@@ -46,7 +46,8 @@ function generateDetailPageHTML(modelName, slug, buildDate) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${escapeHtml(modelName)} - Toktab</title>
+  <title>${escapeHtml(modelName)} Pricing - Toktab</title>
+  <meta name="description" content="Current pricing for ${escapeHtml(modelName)} - input tokens, output tokens, and context window. Compare LLM costs across 2000+ models.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -492,7 +493,8 @@ function generateIndexPageHTML(modelIndex, buildDate) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Toktab: keep tabs on your toks</title>
+  <title>Toktab - LLM Pricing Comparison for 2000+ AI Models</title>
+  <meta name="description" content="Compare pricing for 2000+ LLM models including GPT-4, Claude, Gemini, Llama, and more. Search input/output token costs, context windows, and API pricing. Updated daily.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -901,6 +903,25 @@ async function build() {
   // Write Cloudflare headers config
   fs.writeFileSync(path.join(DIST_DIR, '_headers'), `/api/*
   Content-Type: application/json
+`);
+
+  // Write robots.txt
+  fs.writeFileSync(path.join(DIST_DIR, 'robots.txt'), `User-agent: *
+Allow: /
+
+Sitemap: https://toktab.com/sitemap.xml
+`);
+
+  // Write sitemap.xml
+  const today = new Date().toISOString().split('T')[0];
+  const sitemapUrls = [
+    `  <url><loc>https://toktab.com/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>`,
+    ...modelIndex.map(m => `  <url><loc>https://toktab.com/${m.slug}/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq></url>`)
+  ].join('\n');
+  fs.writeFileSync(path.join(DIST_DIR, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${sitemapUrls}
+</urlset>
 `);
 
   // Write hash file
