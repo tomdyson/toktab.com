@@ -40,7 +40,7 @@ function formatCostPer1M(cost) {
   return `$${per1M.toFixed(2)}`;
 }
 
-function generateDetailPageHTML(modelName, slug) {
+function generateDetailPageHTML(modelName, slug, buildDate) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -275,6 +275,24 @@ function generateDetailPageHTML(modelName, slug) {
     }
 
     #content { display: none; }
+
+    .footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e7e5e4;
+      color: #a8a29e;
+      font-size: 0.875rem;
+    }
+
+    .footer a {
+      color: #4f46e5;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -338,6 +356,12 @@ function generateDetailPageHTML(modelName, slug) {
           <button class="copy-btn" onclick="copyUrl('api-url', this)">Copy</button>
         </div>
       </div>
+    </div>
+
+    <div class="footer">
+      <p>Data sourced from <a href="https://github.com/BerriAI/litellm" target="_blank" rel="noopener">LiteLLM</a></p>
+      <p>Last updated ${buildDate}</p>
+      <p>Site by <a href="https://tomd.org" target="_blank" rel="noopener">Tom Dyson</a></p>
     </div>
   </div>
 
@@ -460,7 +484,7 @@ function generateDetailPageHTML(modelName, slug) {
 </html>`;
 }
 
-function generateIndexPageHTML(modelIndex) {
+function generateIndexPageHTML(modelIndex, buildDate) {
   const indexJSON = JSON.stringify(modelIndex);
 
   return `<!DOCTYPE html>
@@ -658,6 +682,8 @@ function generateIndexPageHTML(modelIndex) {
 
     <div class="footer">
       <p>Data sourced from <a href="https://github.com/BerriAI/litellm" target="_blank" rel="noopener">LiteLLM</a></p>
+      <p>Last updated ${buildDate}</p>
+      <p>Site by <a href="https://tomd.org" target="_blank" rel="noopener">Tom Dyson</a></p>
     </div>
   </div>
 
@@ -834,6 +860,13 @@ async function build() {
   // Build model index for search
   const modelIndex = [];
 
+  // Generate build date
+  const buildDate = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
   // Process each model
   for (const [name, info] of models) {
     const slug = slugify(name);
@@ -856,14 +889,14 @@ async function build() {
     // Create model detail page directory and write HTML
     const pageDir = path.join(DIST_DIR, slug);
     fs.mkdirSync(pageDir, { recursive: true });
-    fs.writeFileSync(path.join(pageDir, 'index.html'), generateDetailPageHTML(name, slug));
+    fs.writeFileSync(path.join(pageDir, 'index.html'), generateDetailPageHTML(name, slug, buildDate));
   }
 
   // Sort index alphabetically
   modelIndex.sort((a, b) => a.name.localeCompare(b.name));
 
   // Write index page
-  fs.writeFileSync(path.join(DIST_DIR, 'index.html'), generateIndexPageHTML(modelIndex));
+  fs.writeFileSync(path.join(DIST_DIR, 'index.html'), generateIndexPageHTML(modelIndex, buildDate));
 
   // Write Cloudflare headers config
   fs.writeFileSync(path.join(DIST_DIR, '_headers'), `/api/*
