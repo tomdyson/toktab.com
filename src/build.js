@@ -672,7 +672,7 @@ function generateIndexPageHTML(modelIndex, buildDate) {
 </head>
 <body>
   <div class="container">
-    <h1><a href="/">Toktab: keep tabs on your toks</a></h1>
+    <h1><a href="/">Toktab</a></h1>
     <p class="subtitle">Search pricing for ${modelIndex.length.toLocaleString()} LLM models</p>
 
     <div class="search-container">
