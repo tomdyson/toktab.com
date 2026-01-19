@@ -57,9 +57,9 @@ Example: `anthropic.claude-3-5-haiku-20241022-v1:0` → `anthropic-claude-3-5-ha
 
 ## Priority Providers
 
-These providers are sorted to the top of search results:
-- anthropic, openai, gemini, vertex_ai, vertex_ai_beta
-- vertex_ai-language-models, deepseek, mistral, xai
+These providers are sorted to the top of search results, in this order:
+1. anthropic, openai, gemini, vertex_ai, vertex_ai_beta
+2. vertex_ai-language-models, deepseek, mistral, xai
 
 ## Deployment
 
