@@ -413,6 +413,18 @@ function generateDetailPageHTML(modelName, slug, buildDate) {
       grid.appendChild(div);
     }
 
+    function addUnitPricingItem(grid, label, cost, unit) {
+      if (cost === null || cost === undefined) return;
+      const div = document.createElement('div');
+      div.className = 'pricing-item';
+      div.innerHTML = \`
+        <div class="pricing-label">\${label}</div>
+        <div class="pricing-value">$\${cost.toFixed(4)}</div>
+        <div class="pricing-per-million">per \${unit}</div>
+      \`;
+      grid.appendChild(div);
+    }
+
     function addContextItem(grid, label, value) {
       if (value === null || value === undefined) return;
       const div = document.createElement('div');
@@ -445,6 +457,10 @@ function generateDetailPageHTML(modelName, slug, buildDate) {
         addPricingItem(pricingGrid, 'Output', data.output_cost_per_token);
         addPricingItem(pricingGrid, 'Cache Write', data.cache_creation_input_token_cost);
         addPricingItem(pricingGrid, 'Cache Read', data.cache_read_input_token_cost);
+        addUnitPricingItem(pricingGrid, 'Input', data.input_cost_per_image, 'image');
+        addUnitPricingItem(pricingGrid, 'Output', data.output_cost_per_image, 'image');
+        addUnitPricingItem(pricingGrid, 'Input', data.input_cost_per_second, 'second');
+        addUnitPricingItem(pricingGrid, 'Output', data.output_cost_per_second, 'second');
 
         if (pricingGrid.children.length === 0) {
           document.getElementById('pricing-section').style.display = 'none';
