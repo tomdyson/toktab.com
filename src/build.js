@@ -280,8 +280,6 @@ function generateDetailPageHTML(modelName, slug, buildDate) {
     .footer {
       text-align: center;
       margin-top: 3rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #e7e5e4;
       color: #a8a29e;
       font-size: 0.875rem;
     }
@@ -360,9 +358,7 @@ function generateDetailPageHTML(modelName, slug, buildDate) {
     </div>
 
     <div class="footer">
-      <p>Data sourced from <a href="https://github.com/BerriAI/litellm" target="_blank" rel="noopener">LiteLLM</a></p>
-      <p>Last updated ${buildDate}</p>
-      <p>Site by <a href="https://tomd.org" target="_blank" rel="noopener">Tom Dyson</a></p>
+      <p>Data sourced from <a href="https://github.com/BerriAI/litellm" target="_blank" rel="noopener">LiteLLM</a> on ${buildDate}. Site by <a href="https://tomd.org" target="_blank" rel="noopener">Tom Dyson</a>.</p>
     </div>
   </div>
 
@@ -644,8 +640,6 @@ function generateIndexPageHTML(modelIndex, buildDate) {
     .footer {
       text-align: center;
       margin-top: 3rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #e7e5e4;
       color: #a8a29e;
       font-size: 0.875rem;
     }
@@ -683,9 +677,7 @@ function generateIndexPageHTML(modelIndex, buildDate) {
     <div id="results" class="results"></div>
 
     <div class="footer">
-      <p>Data sourced from <a href="https://github.com/BerriAI/litellm" target="_blank" rel="noopener">LiteLLM</a></p>
-      <p>Last updated ${buildDate}</p>
-      <p>Site by <a href="https://tomd.org" target="_blank" rel="noopener">Tom Dyson</a></p>
+      <p>Data sourced from <a href="https://github.com/BerriAI/litellm" target="_blank" rel="noopener">LiteLLM</a> on ${buildDate}. Site by <a href="https://tomd.org" target="_blank" rel="noopener">Tom Dyson</a>.</p>
     </div>
   </div>
 
