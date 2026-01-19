@@ -1,0 +1,12 @@
+{
+  "name": "llmcosts",
+  "version": "1.0.0",
+  "description": "Static web app displaying LLM pricing from LiteLLM model prices",
+  "type": "module",
+  "scripts": {
+    "build": "node src/build.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

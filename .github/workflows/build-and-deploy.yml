@@ -1,0 +1,63 @@
+name: Build and Deploy
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # 3 AM UTC daily
+  workflow_dispatch:      # Manual trigger
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch source and check for changes
+        id: check
+        run: |
+          # Fetch source JSON and compute hash
+          curl -s "https://raw.githubusercontent.com/BerriAI/litellm/main/litellm/model_prices_and_context_window_backup.json" -o /tmp/source.json
+          NEW_HASH=$(sha256sum /tmp/source.json | cut -d' ' -f1)
+          echo "new_hash=$NEW_HASH" >> $GITHUB_OUTPUT
+
+          # Check if hash file exists and compare
+          if [ -f .last-build-hash ]; then
+            OLD_HASH=$(cat .last-build-hash)
+            if [ "$NEW_HASH" = "$OLD_HASH" ]; then
+              echo "No changes detected, skipping build"
+              echo "changed=false" >> $GITHUB_OUTPUT
+            else
+              echo "Changes detected"
+              echo "changed=true" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "No previous hash, building"
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build site
+        if: steps.check.outputs.changed == 'true'
+        run: npm run build
+
+      - name: Commit updated hash
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .last-build-hash
+          git diff --staged --quiet || git commit -m "Update build hash [skip ci]"
+          git push
+
+      - name: Deploy to Cloudflare Pages
+        if: steps.check.outputs.changed == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=llmcosts
