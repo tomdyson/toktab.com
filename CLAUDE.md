@@ -65,6 +65,7 @@ Example: `anthropic.claude-3-5-haiku-20241022-v1:0` → `anthropic-claude-3-5-ha
 - **Combined**: `provider:openai 4o` for provider + text search
 - **Priority sorting**: Original providers (anthropic, openai, gemini, vertex_ai-language-models, etc.) appear first
 - **URL state**: Search query synced to `?q=` parameter for history/sharing
+- **Fuzzy fallback**: When no exact matches found, calls `/api/search` for fuzzy results with "Did you mean?" heading
 
 ## Priority Providers
 
