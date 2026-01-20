@@ -985,7 +985,7 @@ function generateAboutPageHTML(modelCount, providerCount, buildDate) {
       <ul>
         <li>Node.js build script fetches data from LiteLLM and generates ${modelCount.toLocaleString()} static HTML pages</li>
         <li>GitHub Actions rebuilds nightly at 3 AM UTC</li>
-        <li>Hosted on Cloudflare Pages</li>
+        <li>Hosted on Cloudflare Pages, with a D1 SQLite database for full text search</li>
         <li>Source code: <a href="https://github.com/tomdyson/toktab.com">github.com/tomdyson/toktab.com</a></li>
         <li>Built by <a href="https://tomd.org">Tom Dyson</a></li>
       </ul>
