@@ -278,12 +278,7 @@ function generateDetailPageHTML(modelName, slug, buildDate) {
     }
 
     .footer a {
-      color: #4f46e5;
-      text-decoration: none;
-    }
-
-    .footer a:hover {
-      text-decoration: underline;
+      color: #8a847e;
     }
   </style>
 </head>
@@ -490,7 +485,7 @@ function generateDetailPageHTML(modelName, slug, buildDate) {
 </html>`;
 }
 
-function generateIndexPageHTML(modelIndex, buildDate) {
+function generateIndexPageHTML(modelIndex, providerCount, buildDate) {
   const indexJSON = JSON.stringify(modelIndex);
 
   return `<!DOCTYPE html>
@@ -499,7 +494,7 @@ function generateIndexPageHTML(modelIndex, buildDate) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Toktab - Current LLM Pricing Data for 2000+ AI Models</title>
-  <meta name="description" content="Current pricing data for 2000+ LLM models including GPT-4, Claude, Gemini, and Llama. Use the free JSON API to access pricing in your code. Updated daily.">
+  <meta name="description" content="Current pricing data for ${modelIndex.length.toLocaleString()} AI models from ${providerCount} providers including OpenAI, Anthropic, Google and Mistral. Free JSON API. Updated daily.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -668,12 +663,7 @@ function generateIndexPageHTML(modelIndex, buildDate) {
     }
 
     .footer a {
-      color: #4f46e5;
-      text-decoration: none;
-    }
-
-    .footer a:hover {
-      text-decoration: underline;
+      color: #8a847e;
     }
   </style>
 </head>
@@ -848,7 +838,7 @@ function generateIndexPageHTML(modelIndex, buildDate) {
 </html>`;
 }
 
-function generateAboutPageHTML(modelCount, buildDate) {
+function generateAboutPageHTML(modelCount, providerCount, buildDate) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -966,7 +956,7 @@ function generateAboutPageHTML(modelCount, buildDate) {
 
     <div class="content">
       <h2>What is Toktab?</h2>
-      <p>Toktab provides current pricing data for ${modelCount.toLocaleString()} AI models from providers like OpenAI, Anthropic, Google, Mistral, and many more. The data is sourced from <a href="https://github.com/BerriAI/litellm">LiteLLM</a> and updated nightly.</p>
+      <p>Toktab provides current pricing data for ${modelCount.toLocaleString()} AI models from ${providerCount} providers, including OpenAI, Anthropic, Google and Mistral. The data is sourced from <a href="https://github.com/BerriAI/litellm">LiteLLM</a> and updated nightly.</p>
 
       <h2>How to search</h2>
       <p>Type in the search box to find models by name or provider:</p>
@@ -1081,12 +1071,15 @@ async function build() {
   // Sort index alphabetically
   modelIndex.sort((a, b) => a.name.localeCompare(b.name));
 
+  // Count unique providers
+  const providerCount = new Set(modelIndex.map(m => m.provider)).size;
+
   // Write index page
-  fs.writeFileSync(path.join(DIST_DIR, 'index.html'), generateIndexPageHTML(modelIndex, buildDate));
+  fs.writeFileSync(path.join(DIST_DIR, 'index.html'), generateIndexPageHTML(modelIndex, providerCount, buildDate));
 
   // Write about page
   fs.mkdirSync(path.join(DIST_DIR, 'about'), { recursive: true });
-  fs.writeFileSync(path.join(DIST_DIR, 'about', 'index.html'), generateAboutPageHTML(modelIndex.length, buildDate));
+  fs.writeFileSync(path.join(DIST_DIR, 'about', 'index.html'), generateAboutPageHTML(modelIndex.length, providerCount, buildDate));
 
   // Write Cloudflare headers config
   fs.writeFileSync(path.join(DIST_DIR, '_headers'), `/api/*
