@@ -21,6 +21,7 @@ toktab/
 ├── dist/                     # Generated output (git-ignored)
 │   ├── index.html            # Search homepage with embedded model index
 │   ├── 404.html              # Dynamic 404 with model suggestions
+│   ├── openapi.json          # OpenAPI 3.1 spec for the API
 │   ├── seed.sql              # D1 database schema and data
 │   ├── _headers              # Cloudflare headers (JSON content-type for /api/*)
 │   ├── api/[slug]/index.html # Raw JSON endpoints
@@ -51,6 +52,7 @@ npm run db:seed:remote  # Seed production D1 database
 4. Generates index page with embedded model array for client-side search
 5. Generates `seed.sql` with D1 schema and FTS5 index for fuzzy search
 6. Generates `404.html` that fetches suggestions from search API
+7. Generates `openapi.json` OpenAPI 3.1 specification
 
 ## URL Slugs
 
@@ -81,6 +83,12 @@ These providers are sorted to the top of search results, in this order:
 - Supports partial matches and typos (e.g., "claud" matches "claude")
 - Falls back to LIKE search for queries < 3 characters
 - Results ranked by BM25 relevance, with priority providers boosted
+
+## OpenAPI Spec
+
+Available at `https://toktab.com/openapi.json`. Documents both API endpoints:
+- `GET /api/{slug}/` - Get model pricing data
+- `GET /api/search?q={query}` - Fuzzy search models
 
 ## 404 Page
 

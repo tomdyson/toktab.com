@@ -1020,6 +1020,166 @@ function generateAboutPageHTML(modelCount, providerCount, buildDate) {
 </html>`;
 }
 
+function generateOpenAPISpec() {
+  return JSON.stringify({
+    openapi: "3.1.0",
+    info: {
+      title: "TokTab LLM Pricing API",
+      description: "Free API for LLM model pricing data. Every model has a static JSON endpoint, plus fuzzy search across 2000+ models. Data sourced from LiteLLM and updated nightly.",
+      version: "1.0.0",
+      contact: { url: "https://toktab.com" },
+      license: { name: "MIT" }
+    },
+    servers: [{ url: "https://toktab.com", description: "Production" }],
+    paths: {
+      "/api/{slug}/": {
+        get: {
+          operationId: "getModel",
+          summary: "Get model pricing data",
+          description: "Returns pricing, context window, and capability data for a specific model. Model slugs are derived from LiteLLM model names with `/`, `.`, and `:` replaced by `-`. No authentication required.",
+          parameters: [{
+            name: "slug",
+            in: "path",
+            required: true,
+            description: "Model slug. Examples: `claude-sonnet-4-20250514`, `gpt-4o`, `anthropic-claude-3-5-sonnet-20241022`",
+            schema: { type: "string" }
+          }],
+          responses: {
+            "200": {
+              description: "Model data from LiteLLM",
+              content: {
+                "application/json": {
+                  schema: { "$ref": "#/components/schemas/Model" },
+                  example: {
+                    max_tokens: 8192,
+                    max_input_tokens: 200000,
+                    max_output_tokens: 8192,
+                    input_cost_per_token: 0.000003,
+                    output_cost_per_token: 0.000015,
+                    litellm_provider: "anthropic",
+                    mode: "chat",
+                    supports_function_calling: true,
+                    supports_vision: true,
+                    supports_prompt_caching: true
+                  }
+                }
+              }
+            },
+            "404": { description: "Model not found" }
+          }
+        }
+      },
+      "/api/search": {
+        get: {
+          operationId: "searchModels",
+          summary: "Search models",
+          description: "Fuzzy search across all models by name, slug, or provider. Uses FTS5 trigram matching for queries 3+ characters with fallback to LIKE search for shorter queries. Results sorted by provider priority (anthropic, openai, gemini first) then relevance.",
+          parameters: [
+            {
+              name: "q",
+              in: "query",
+              required: true,
+              description: "Search query. Matches model name, slug, and provider. Supports partial matches and typos.",
+              schema: { type: "string", minLength: 1 },
+              example: "claude"
+            },
+            {
+              name: "limit",
+              in: "query",
+              required: false,
+              description: "Maximum results to return (default 20, max 50)",
+              schema: { type: "integer", minimum: 1, maximum: 50, default: 20 }
+            }
+          ],
+          responses: {
+            "200": {
+              description: "Search results",
+              content: {
+                "application/json": {
+                  schema: { "$ref": "#/components/schemas/SearchResponse" },
+                  example: {
+                    results: [{ name: "claude-sonnet-4-20250514", slug: "claude-sonnet-4-20250514", provider: "anthropic", mode: "chat", input_cost_per_token: 0.000003, output_cost_per_token: 0.000015 }],
+                    query: "claude",
+                    count: 1
+                  }
+                }
+              }
+            },
+            "400": {
+              description: "Missing query parameter",
+              content: {
+                "application/json": {
+                  schema: { "$ref": "#/components/schemas/SearchResponse" },
+                  example: { results: [], query: "", count: 0, error: "Query parameter required (use ?q=your+search)" }
+                }
+              }
+            },
+            "500": {
+              description: "Server error",
+              content: {
+                "application/json": {
+                  schema: { "$ref": "#/components/schemas/SearchResponse" },
+                  example: { results: [], query: "claude", count: 0, error: "Search failed" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    components: {
+      schemas: {
+        SearchResponse: {
+          type: "object",
+          required: ["results", "query", "count"],
+          properties: {
+            results: { type: "array", items: { "$ref": "#/components/schemas/SearchResult" } },
+            query: { type: "string", description: "The executed search query" },
+            count: { type: "integer", description: "Number of results" },
+            error: { type: "string", description: "Error message (only present on error)" }
+          }
+        },
+        SearchResult: {
+          type: "object",
+          properties: {
+            name: { type: "string", description: "Model name from LiteLLM" },
+            slug: { type: "string", description: "URL-safe slug" },
+            provider: { type: "string", description: "Provider (anthropic, openai, gemini, etc.)" },
+            mode: { type: ["string", "null"], description: "Model mode (chat, completion, embedding, etc.)" },
+            input_cost_per_token: { type: ["number", "null"], description: "Input cost in USD per token" },
+            output_cost_per_token: { type: ["number", "null"], description: "Output cost in USD per token" }
+          }
+        },
+        Model: {
+          type: "object",
+          description: "Model data from LiteLLM. Fields vary by model.",
+          properties: {
+            litellm_provider: { type: "string", description: "LiteLLM provider identifier" },
+            mode: { type: "string", description: "Model mode: chat, completion, embedding, image_generation, etc." },
+            max_tokens: { type: "integer", description: "Maximum output tokens" },
+            max_input_tokens: { type: "integer", description: "Maximum input context length" },
+            max_output_tokens: { type: "integer", description: "Maximum output tokens" },
+            input_cost_per_token: { type: "number", description: "Cost per input token in USD" },
+            output_cost_per_token: { type: "number", description: "Cost per output token in USD" },
+            input_cost_per_image: { type: "number", description: "Cost per input image in USD" },
+            output_cost_per_image: { type: "number", description: "Cost per output image in USD" },
+            input_cost_per_second: { type: "number", description: "Cost per second of input audio/video in USD" },
+            output_cost_per_second: { type: "number", description: "Cost per second of output audio/video in USD" },
+            supports_function_calling: { type: "boolean", description: "Supports function/tool calling" },
+            supports_vision: { type: "boolean", description: "Supports image inputs" },
+            supports_audio_input: { type: "boolean", description: "Supports audio inputs" },
+            supports_audio_output: { type: "boolean", description: "Supports audio outputs" },
+            supports_prompt_caching: { type: "boolean", description: "Supports prompt caching" },
+            supports_response_schema: { type: "boolean", description: "Supports structured output schemas" },
+            supports_system_messages: { type: "boolean", description: "Supports system messages" },
+            supports_tool_choice: { type: "boolean", description: "Supports tool choice parameter" }
+          }
+        }
+      }
+    }
+  }, null, 2);
+}
+
 function generate404PageHTML() {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -1368,8 +1528,14 @@ async function build() {
   // Write 404 page (static HTML that fetches suggestions client-side)
   fs.writeFileSync(path.join(DIST_DIR, '404.html'), generate404PageHTML());
 
+  // Write OpenAPI spec
+  fs.writeFileSync(path.join(DIST_DIR, 'openapi.json'), generateOpenAPISpec());
+
   // Write Cloudflare headers config
   fs.writeFileSync(path.join(DIST_DIR, '_headers'), `/api/*
+  Content-Type: application/json
+
+/openapi.json
   Content-Type: application/json
 `);
 
@@ -1411,6 +1577,7 @@ ${sitemapUrls}
   console.log(`  - 1 index page`);
   console.log(`  - 1 about page`);
   console.log(`  - 1 404 page`);
+  console.log(`  - 1 openapi.json`);
   console.log(`  - 1 seed.sql for D1`);
   console.log(`Output: ${DIST_DIR}/`);
 }
