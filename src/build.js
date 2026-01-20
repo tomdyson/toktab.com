@@ -706,8 +706,16 @@ function generateIndexPageHTML(modelIndex, providerCount, buildDate) {
     const resultsCount = document.getElementById('results-count');
     const MAX_RESULTS = 50;
 
-    function renderResults(filtered) {
+    function renderResults(filtered, query, isFuzzy = false) {
       const toShow = filtered.slice(0, MAX_RESULTS);
+
+      if (filtered.length === 0 && !isFuzzy) {
+        // No local results - try fuzzy search API
+        resultsCount.textContent = '';
+        resultsContainer.innerHTML = '<div class="empty-state">Searching...</div>';
+        fetchFuzzySuggestions(query);
+        return;
+      }
 
       if (filtered.length === 0) {
         resultsCount.textContent = '';
@@ -715,11 +723,12 @@ function generateIndexPageHTML(modelIndex, providerCount, buildDate) {
         return;
       }
 
-      resultsCount.textContent = filtered.length === 1
+      const prefix = isFuzzy ? 'Did you mean? ' : '';
+      resultsCount.textContent = prefix + (filtered.length === 1
         ? '1 model found'
         : filtered.length <= MAX_RESULTS
           ? filtered.length + ' models found'
-          : 'Showing ' + MAX_RESULTS + ' of ' + filtered.length + ' models';
+          : 'Showing ' + MAX_RESULTS + ' of ' + filtered.length + ' models');
 
       resultsContainer.innerHTML = toShow.map(m => \`
         <a href="/\${m.slug}/" class="model-card">
@@ -729,6 +738,22 @@ function generateIndexPageHTML(modelIndex, providerCount, buildDate) {
           </div>
         </a>
       \`).join('');
+    }
+
+    async function fetchFuzzySuggestions(query) {
+      try {
+        const response = await fetch('/api/search?q=' + encodeURIComponent(query) + '&limit=' + MAX_RESULTS);
+        const data = await response.json();
+        if (data.results && data.results.length > 0) {
+          renderResults(data.results, query, true);
+        } else {
+          resultsCount.textContent = '';
+          resultsContainer.innerHTML = '<div class="empty-state">No models found. Try a different search term.</div>';
+        }
+      } catch (err) {
+        resultsCount.textContent = '';
+        resultsContainer.innerHTML = '<div class="empty-state">No models found. Try a different search term.</div>';
+      }
     }
 
     function escapeHtml(str) {
@@ -807,7 +832,7 @@ function generateIndexPageHTML(modelIndex, providerCount, buildDate) {
           if (textQuery && !m.name.toLowerCase().includes(textQuery)) return false;
           return true;
         });
-        renderResults(sortByPriority(filtered));
+        renderResults(sortByPriority(filtered), q);
         return;
       }
 
@@ -817,7 +842,7 @@ function generateIndexPageHTML(modelIndex, providerCount, buildDate) {
         m.name.toLowerCase().includes(qLower) ||
         m.provider.toLowerCase().includes(qLower)
       );
-      renderResults(sortByPriority(filtered));
+      renderResults(sortByPriority(filtered), q);
     }
 
     searchInput.addEventListener('input', (e) => search(e.target.value, true));
