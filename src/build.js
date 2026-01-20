@@ -1002,6 +1002,14 @@ function generateAboutPageHTML(modelCount, providerCount, buildDate) {
       <pre><code>curl "https://toktab.com/api/search?q=claude&amp;limit=10"</code></pre>
       <p>Returns matching models ranked by relevance. Supports partial matches and typos.</p>
 
+      <h2>CLI Tool</h2>
+      <p>Use <a href="https://github.com/tomdyson/toktab-cli">toktab</a> for quick terminal access:</p>
+      <pre><code>uvx toktab gpt-4o
+uvx toktab --json gemini-3-flash-preview
+uvx toktab search claude
+uvx toktab --help</code></pre>
+      <p>Displays pricing in colour-coded tables. No API key required.</p>
+
       <h2>Model not found?</h2>
       <p>If you visit a URL for a model that doesn't exist, Toktab will suggest similar models that you might be looking for.</p>
 
