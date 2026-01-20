@@ -358,7 +358,7 @@ function generateDetailPageHTML(modelName, slug, buildDate) {
     </div>
 
     <div class="footer">
-      <p>Data sourced from <a href="https://github.com/BerriAI/litellm" target="_blank" rel="noopener">LiteLLM</a> on ${buildDate}. Site by <a href="https://tomd.org" target="_blank" rel="noopener">Tom Dyson</a>.</p>
+      <p>Data sourced from <a href="https://github.com/BerriAI/litellm" target="_blank" rel="noopener">LiteLLM</a> on ${buildDate}. <a href="/about/">About this site</a>.</p>
     </div>
   </div>
 
@@ -673,7 +673,7 @@ function generateIndexPageHTML(modelIndex, buildDate) {
 <body>
   <div class="container">
     <h1><a href="/">Toktab</a></h1>
-    <p class="subtitle">Search pricing for ${modelIndex.length.toLocaleString()} LLM models</p>
+    <p class="subtitle">Current pricing for ${modelIndex.length.toLocaleString()} AI models</p>
 
     <div class="search-container">
       <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
@@ -693,7 +693,7 @@ function generateIndexPageHTML(modelIndex, buildDate) {
     <div id="results" class="results"></div>
 
     <div class="footer">
-      <p>Data sourced from <a href="https://github.com/BerriAI/litellm" target="_blank" rel="noopener">LiteLLM</a> on ${buildDate}. Site by <a href="https://tomd.org" target="_blank" rel="noopener">Tom Dyson</a>.</p>
+      <p>Data sourced from <a href="https://github.com/BerriAI/litellm" target="_blank" rel="noopener">LiteLLM</a> on ${buildDate}. <a href="/about/">About this site</a>.</p>
     </div>
   </div>
 
@@ -788,8 +788,8 @@ function generateIndexPageHTML(modelIndex, buildDate) {
         updateUrl(q);
       }
       if (!q) {
-        renderResults(models.slice(0, MAX_RESULTS));
-        resultsCount.textContent = 'Showing ' + MAX_RESULTS + ' of ' + models.length + ' models';
+        resultsCount.textContent = '';
+        resultsContainer.innerHTML = '';
         return;
       }
 
@@ -832,6 +832,162 @@ function generateIndexPageHTML(modelIndex, buildDate) {
     searchInput.value = initialQuery;
     search(initialQuery, false);
   </script>
+</body>
+</html>`;
+}
+
+function generateAboutPageHTML(modelCount, buildDate) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About - Toktab</title>
+  <meta name="description" content="Learn how Toktab works and how to use the free JSON API for LLM pricing data.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #FBF9F6;
+      background-image: repeating-linear-gradient(
+        135deg,
+        transparent,
+        transparent 10px,
+        rgba(0,0,0,0.02) 10px,
+        rgba(0,0,0,0.02) 20px
+      );
+      min-height: 100vh;
+      color: #4A443C;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    h1 {
+      font-family: 'Gowun Batang', serif;
+      font-size: 2.5rem;
+      color: #4A443C;
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+
+    h1 a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    h1 a:hover {
+      text-decoration: underline;
+    }
+
+    h2 {
+      font-family: 'Gowun Batang', serif;
+      font-size: 1.5rem;
+      color: #4A443C;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #78716c;
+      margin-bottom: 2rem;
+    }
+
+    .content {
+      background: white;
+      border: 1px solid #e7e5e4;
+      border-radius: 12px;
+      padding: 2rem;
+    }
+
+    p {
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    code {
+      background: #f5f5f4;
+      padding: 0.125rem 0.375rem;
+      border-radius: 4px;
+      font-size: 0.875em;
+    }
+
+    pre {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin-bottom: 1rem;
+    }
+
+    pre code {
+      background: none;
+      padding: 0;
+      font-size: 0.875rem;
+    }
+
+    a {
+      color: #4f46e5;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><a href="/">Toktab</a></h1>
+    <p class="subtitle">About this site</p>
+
+    <div class="content">
+      <h2>What is Toktab?</h2>
+      <p>Toktab provides current pricing data for ${modelCount.toLocaleString()} AI models from providers like OpenAI, Anthropic, Google, Mistral, and many more. The data is sourced from <a href="https://github.com/BerriAI/litellm">LiteLLM</a> and updated nightly.</p>
+
+      <h2>How to search</h2>
+      <p>Type in the search box to find models by name or provider:</p>
+      <ul>
+        <li><code>claude</code> &mdash; finds all models with "claude" in the name</li>
+        <li><code>gpt-4</code> &mdash; finds GPT-4 models</li>
+        <li><code>provider:anthropic</code> &mdash; shows only Anthropic models</li>
+        <li><code>provider:openai 4o</code> &mdash; OpenAI models containing "4o"</li>
+      </ul>
+
+      <h2>JSON API</h2>
+      <p>Every model has a JSON endpoint. Just add <code>/api/</code> before the model slug:</p>
+      <pre><code>curl https://toktab.com/api/anthropic-claude-3-5-sonnet-20241022/</code></pre>
+      <p>Returns pricing, context window, and other metadata. No authentication required.</p>
+
+      <h2>How it's built</h2>
+      <p>Toktab is a static site with no runtime dependencies:</p>
+      <ul>
+        <li>Node.js build script fetches data from LiteLLM and generates ${modelCount.toLocaleString()} static HTML pages</li>
+        <li>GitHub Actions rebuilds nightly at 3 AM UTC</li>
+        <li>Hosted on Cloudflare Pages</li>
+        <li>Source code: <a href="https://github.com/tomdyson/toktab.com">github.com/tomdyson/toktab.com</a></li>
+        <li>Built by <a href="https://tomd.org">Tom Dyson</a></li>
+      </ul>
+    </div>
+  </div>
 </body>
 </html>`;
 }
@@ -923,6 +1079,10 @@ async function build() {
   // Write index page
   fs.writeFileSync(path.join(DIST_DIR, 'index.html'), generateIndexPageHTML(modelIndex, buildDate));
 
+  // Write about page
+  fs.mkdirSync(path.join(DIST_DIR, 'about'), { recursive: true });
+  fs.writeFileSync(path.join(DIST_DIR, 'about', 'index.html'), generateAboutPageHTML(modelIndex.length, buildDate));
+
   // Write Cloudflare headers config
   fs.writeFileSync(path.join(DIST_DIR, '_headers'), `/api/*
   Content-Type: application/json
@@ -939,6 +1099,7 @@ Sitemap: https://toktab.com/sitemap.xml
   const today = new Date().toISOString().split('T')[0];
   const sitemapUrls = [
     `  <url><loc>https://toktab.com/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>`,
+    `  <url><loc>https://toktab.com/about/</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq></url>`,
     ...modelIndex.map(m => `  <url><loc>https://toktab.com/${m.slug}/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq></url>`)
   ].join('\n');
   fs.writeFileSync(path.join(DIST_DIR, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>
@@ -954,6 +1115,7 @@ ${sitemapUrls}
   console.log(`  - ${models.length} model pages`);
   console.log(`  - ${models.length} API endpoints`);
   console.log(`  - 1 index page`);
+  console.log(`  - 1 about page`);
   console.log(`Output: ${DIST_DIR}/`);
 }
 
