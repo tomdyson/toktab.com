@@ -957,7 +957,7 @@ function generateAboutPageHTML(modelCount, buildDate) {
 <body>
   <div class="container">
     <h1><a href="/">Toktab</a></h1>
-    <p class="subtitle">About this site</p>
+    <p class="subtitle">Keep tabs on your toks</p>
 
     <div class="content">
       <h2>What is Toktab?</h2>
