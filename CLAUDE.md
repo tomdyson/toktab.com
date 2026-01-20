@@ -6,21 +6,28 @@ A static web app displaying LLM pricing data from [LiteLLM](https://github.com/B
 
 - **Build**: Node.js 20+ (ES modules, no dependencies)
 - **Hosting**: Cloudflare Pages
+- **Database**: Cloudflare D1 (SQLite) with FTS5 for fuzzy search
 - **Styling**: Signature look (warm beige background, Gowun Batang headings, Inter body, indigo accents)
 
 ## Project Structure
 
 ```
-llmcosts/
+toktab/
 ├── src/
-│   └── build.js              # Single build script (~800 lines)
+│   └── build.js              # Single build script (~1200 lines)
+├── functions/
+│   └── api/
+│       └── search.js         # Cloudflare Pages Function for /api/search
 ├── dist/                     # Generated output (git-ignored)
 │   ├── index.html            # Search homepage with embedded model index
+│   ├── 404.html              # Dynamic 404 with model suggestions
+│   ├── seed.sql              # D1 database schema and data
 │   ├── _headers              # Cloudflare headers (JSON content-type for /api/*)
 │   ├── api/[slug]/index.html # Raw JSON endpoints
 │   └── [slug]/index.html     # Model detail pages
 ├── .github/workflows/
 │   └── build-and-deploy.yml  # Nightly build at 3 AM UTC
+├── wrangler.toml             # D1 database binding
 ├── .last-build-hash          # SHA256 for change detection
 └── package.json
 ```
@@ -28,8 +35,10 @@ llmcosts/
 ## Commands
 
 ```bash
-npm run build      # Fetch data and generate dist/
-npx serve dist     # Local preview server
+npm run build           # Fetch data and generate dist/ + seed.sql
+npm run dev             # Local dev server with D1 binding
+npm run db:seed:local   # Seed local D1 database
+npm run db:seed:remote  # Seed production D1 database
 ```
 
 ## How It Works
@@ -40,6 +49,8 @@ npx serve dist     # Local preview server
    - `/api/[slug]/index.html` - JSON data (served as `application/json` via `_headers`)
    - `/[slug]/index.html` - Detail page that fetches its own API endpoint
 4. Generates index page with embedded model array for client-side search
+5. Generates `seed.sql` with D1 schema and FTS5 index for fuzzy search
+6. Generates `404.html` that fetches suggestions from search API
 
 ## URL Slugs
 
@@ -61,12 +72,31 @@ These providers are sorted to the top of search results, in this order:
 1. anthropic, openai, gemini, vertex_ai, vertex_ai_beta
 2. vertex_ai-language-models, deepseek, mistral, xai
 
+## Search API
+
+`GET /api/search?q={query}&limit={n}`
+
+- Uses D1 with FTS5 trigram tokenizer for fuzzy matching
+- Supports partial matches and typos (e.g., "claud" matches "claude")
+- Falls back to LIKE search for queries < 3 characters
+- Results ranked by BM25 relevance, with priority providers boosted
+
+## 404 Page
+
+When users visit a non-existent model URL:
+1. Static `404.html` is served (no worker invocation)
+2. Client-side JS fetches `/api/search` with the failed slug
+3. Displays similar model suggestions
+
 ## Deployment
 
 GitHub Action runs nightly:
 1. Fetches source JSON, computes SHA256
 2. Skips if hash matches `.last-build-hash`
 3. Runs build, commits new hash
-4. Deploys to Cloudflare Pages via wrangler
+4. Seeds D1 database with `seed.sql`
+5. Deploys to Cloudflare Pages via wrangler
 
 **Required secrets**: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
+
+**D1 Database**: `toktab-models` (ID: `9e2aaf5e-cb0b-492c-aca2-9dbf9f571b31`)
