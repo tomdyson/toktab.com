@@ -12,7 +12,10 @@
       "mcp__chrome-devtools__fill",
       "mcp__chrome-devtools__take_screenshot",
       "Bash(pkill:*)",
-      "mcp__chrome-devtools__close_page"
+      "mcp__chrome-devtools__close_page",
+      "Bash(xargs:*)",
+      "Bash(npx wrangler d1 execute toktab-models --local --command \"DROP TABLE IF EXISTS models_fts; DROP TABLE IF EXISTS models;\")",
+      "Bash(npx wrangler d1 execute:*)"
     ]
   }
 }
