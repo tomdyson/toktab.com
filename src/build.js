@@ -56,14 +56,7 @@ function generateDetailPageHTML(modelName, slug, buildDate) {
 
     body {
       font-family: 'Inter', sans-serif;
-      background-color: #FBF9F6;
-      background-image: repeating-linear-gradient(
-        135deg,
-        transparent,
-        transparent 10px,
-        rgba(0,0,0,0.02) 10px,
-        rgba(0,0,0,0.02) 20px
-      );
+      background-color: rgb(250, 249, 245);
       min-height: 100vh;
       color: #4A443C;
       line-height: 1.6;
@@ -515,14 +508,7 @@ function generateIndexPageHTML(modelIndex, buildDate) {
 
     body {
       font-family: 'Inter', sans-serif;
-      background-color: #FBF9F6;
-      background-image: repeating-linear-gradient(
-        135deg,
-        transparent,
-        transparent 10px,
-        rgba(0,0,0,0.02) 10px,
-        rgba(0,0,0,0.02) 20px
-      );
+      background-color: rgb(250, 249, 245);
       min-height: 100vh;
       color: #4A443C;
       line-height: 1.6;
@@ -534,12 +520,28 @@ function generateIndexPageHTML(modelIndex, buildDate) {
       padding: 2rem 1rem;
     }
 
+    .header {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 1rem;
+      align-items: end;
+      margin-bottom: 2rem;
+    }
+
+    .header-figure {
+      width: 115px;
+      justify-self: end;
+    }
+
+    .header-text {
+    }
+
     h1 {
       font-family: 'Gowun Batang', serif;
-      font-size: 2.5rem;
+      font-size: 4rem;
       color: #4A443C;
-      text-align: center;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0;
+      line-height: 1.1;
     }
 
     h1 a {
@@ -552,9 +554,14 @@ function generateIndexPageHTML(modelIndex, buildDate) {
     }
 
     .subtitle {
-      text-align: center;
       color: #78716c;
-      margin-bottom: 2rem;
+      margin: 0;
+    }
+
+    @media (max-width: 500px) {
+      .header-figure {
+        display: none;
+      }
     }
 
     .search-container {
@@ -672,8 +679,13 @@ function generateIndexPageHTML(modelIndex, buildDate) {
 </head>
 <body>
   <div class="container">
-    <h1><a href="/">Toktab</a></h1>
-    <p class="subtitle">Current pricing for ${modelIndex.length.toLocaleString()} AI models</p>
+    <div class="header">
+      <img src="/paris-figure.png" alt="" class="header-figure" aria-hidden="true">
+      <div class="header-text">
+        <h1><a href="/">Toktab</a></h1>
+        <p class="subtitle">Current pricing for ${modelIndex.length.toLocaleString()} AI models</p>
+      </div>
+    </div>
 
     <div class="search-container">
       <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
@@ -852,14 +864,7 @@ function generateAboutPageHTML(modelCount, buildDate) {
 
     body {
       font-family: 'Inter', sans-serif;
-      background-color: #FBF9F6;
-      background-image: repeating-linear-gradient(
-        135deg,
-        transparent,
-        transparent 10px,
-        rgba(0,0,0,0.02) 10px,
-        rgba(0,0,0,0.02) 20px
-      );
+      background-color: rgb(250, 249, 245);
       min-height: 100vh;
       color: #4A443C;
       line-height: 1.6;
@@ -1087,6 +1092,12 @@ async function build() {
   fs.writeFileSync(path.join(DIST_DIR, '_headers'), `/api/*
   Content-Type: application/json
 `);
+
+  // Copy static assets
+  if (fs.existsSync('paris-figure.png')) {
+    fs.copyFileSync('paris-figure.png', path.join(DIST_DIR, 'paris-figure.png'));
+    console.log('  - Copied paris-figure.png');
+  }
 
   // Write robots.txt
   fs.writeFileSync(path.join(DIST_DIR, 'robots.txt'), `User-agent: *
