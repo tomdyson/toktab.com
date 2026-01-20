@@ -6,7 +6,13 @@
       "mcp__chrome-devtools__navigate_page",
       "mcp__chrome-devtools__take_snapshot",
       "mcp__chrome-devtools__evaluate_script",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebFetch(domain:toktab.com)",
+      "mcp__chrome-devtools__new_page",
+      "mcp__chrome-devtools__fill",
+      "mcp__chrome-devtools__take_screenshot",
+      "Bash(pkill:*)",
+      "mcp__chrome-devtools__close_page"
     ]
   }
 }
