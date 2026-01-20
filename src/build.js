@@ -968,9 +968,17 @@ function generateAboutPageHTML(modelCount, providerCount, buildDate) {
       </ul>
 
       <h2>JSON API</h2>
-      <p>Every model has a JSON endpoint. Just add <code>/api/</code> before the model slug:</p>
+      <p>Every model has a JSON endpoint. Add <code>/api/</code> before the model slug:</p>
       <pre><code>curl https://toktab.com/api/anthropic-claude-3-5-sonnet-20241022/</code></pre>
       <p>Returns pricing, context window, and other metadata. No authentication required.</p>
+
+      <h2>Search API</h2>
+      <p>Fuzzy search across all models:</p>
+      <pre><code>curl "https://toktab.com/api/search?q=claude&amp;limit=10"</code></pre>
+      <p>Returns matching models ranked by relevance. Supports partial matches and typos.</p>
+
+      <h2>Model not found?</h2>
+      <p>If you visit a URL for a model that doesn't exist, Toktab will suggest similar models that you might be looking for.</p>
 
       <h2>How it's built</h2>
       <p>Toktab is a static site with no runtime dependencies:</p>
