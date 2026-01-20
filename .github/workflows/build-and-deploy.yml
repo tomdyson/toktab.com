@@ -50,6 +50,14 @@ jobs:
         if: steps.check.outputs.changed == 'true'
         run: npm run build
 
+      - name: Update D1 database
+        if: steps.check.outputs.changed == 'true'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: d1 execute toktab-models --remote --file=dist/seed.sql
+
       - name: Commit updated hash
         if: steps.check.outputs.changed == 'true'
         run: |

@@ -4,7 +4,10 @@
   "description": "Static web app displaying LLM pricing from LiteLLM model prices",
   "type": "module",
   "scripts": {
-    "build": "node src/build.js"
+    "build": "node src/build.js",
+    "dev": "wrangler pages dev dist --d1 DB=toktab-models",
+    "db:seed:local": "wrangler d1 execute toktab-models --local --file=dist/seed.sql",
+    "db:seed:remote": "wrangler d1 execute toktab-models --remote --file=dist/seed.sql"
   },
   "engines": {
     "node": ">=20.0.0"

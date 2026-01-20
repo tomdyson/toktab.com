@@ -1,0 +1,12 @@
+name = "toktab"
+compatibility_date = "2024-01-01"
+
+# Output directory for Cloudflare Pages
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "toktab-models"
+database_id = "9e2aaf5e-cb0b-492c-aca2-9dbf9f571b31"
+# For local development with wrangler pages dev
+preview_database_id = "local"

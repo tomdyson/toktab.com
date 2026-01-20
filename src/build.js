@@ -987,6 +987,183 @@ function generateAboutPageHTML(modelCount, providerCount, buildDate) {
 </html>`;
 }
 
+function generate404PageHTML() {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Model Not Found - Toktab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: rgb(250, 249, 245);
+      min-height: 100vh;
+      color: #4A443C;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 4rem 1rem;
+      text-align: center;
+    }
+    h1 {
+      font-family: 'Gowun Batang', serif;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #4A443C;
+    }
+    .subtitle {
+      color: #78716c;
+      margin-bottom: 2rem;
+      font-size: 1.125rem;
+    }
+    .slug-highlight {
+      font-family: ui-monospace, monospace;
+      background: #f5f5f4;
+      padding: 0.125rem 0.5rem;
+      border-radius: 4px;
+    }
+    .search-link {
+      display: inline-block;
+      background: #4f46e5;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      transition: background-color 0.2s;
+    }
+    .search-link:hover {
+      background: #4338ca;
+    }
+    .home-link {
+      display: inline-block;
+      color: #4f46e5;
+      text-decoration: none;
+      font-weight: 500;
+      margin-left: 1rem;
+    }
+    .home-link:hover {
+      text-decoration: underline;
+    }
+    .suggestions {
+      text-align: left;
+      margin-top: 2rem;
+      display: none;
+    }
+    .suggestions.visible {
+      display: block;
+    }
+    .suggestions h2 {
+      font-family: 'Gowun Batang', serif;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      text-align: center;
+      color: #4A443C;
+    }
+    .suggestion-card {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: white;
+      border: 1px solid #e7e5e4;
+      border-radius: 8px;
+      padding: 0.875rem 1rem;
+      margin-bottom: 0.5rem;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .suggestion-card:hover {
+      border-color: #4f46e5;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .provider {
+      background: #e0e7ff;
+      color: #4338ca;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+    .name {
+      font-weight: 500;
+      word-break: break-word;
+    }
+    .actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .loading {
+      color: #78716c;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Model Not Found</h1>
+    <p class="subtitle">We couldn't find a model matching <span class="slug-highlight" id="slug"></span></p>
+    <div class="actions">
+      <a href="/" class="search-link" id="search-link">Search</a>
+      <a href="/" class="home-link">Go home</a>
+    </div>
+    <div class="suggestions" id="suggestions">
+      <h2>Similar models</h2>
+      <div id="suggestions-list"></div>
+    </div>
+    <p class="loading" id="loading">Looking for similar models...</p>
+  </div>
+  <script>
+    // Extract slug from URL path
+    const path = window.location.pathname;
+    const slug = path.replace(/^\\/+|\\/+$/g, '');
+
+    // Display slug in page
+    document.getElementById('slug').textContent = slug;
+    document.getElementById('search-link').href = '/?q=' + encodeURIComponent(slug);
+    document.getElementById('search-link').textContent = 'Search for "' + slug.slice(0, 30) + (slug.length > 30 ? '...' : '') + '"';
+
+    // Fetch suggestions from search API
+    fetch('/api/search?q=' + encodeURIComponent(slug) + '&limit=5')
+      .then(r => r.json())
+      .then(data => {
+        document.getElementById('loading').style.display = 'none';
+        if (data.results && data.results.length > 0) {
+          const list = document.getElementById('suggestions-list');
+          list.innerHTML = data.results.map(m =>
+            '<a href="/' + escapeHtml(m.slug) + '/" class="suggestion-card">' +
+            '<span class="provider">' + escapeHtml(m.provider) + '</span>' +
+            '<span class="name">' + escapeHtml(m.name) + '</span>' +
+            '</a>'
+          ).join('');
+          document.getElementById('suggestions').classList.add('visible');
+        }
+      })
+      .catch(() => {
+        document.getElementById('loading').style.display = 'none';
+      });
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>`;
+}
+
 function escapeHtml(str) {
   if (!str) return '';
   return str
@@ -995,6 +1172,80 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+function escapeSql(str) {
+  if (str === null || str === undefined) return null;
+  return String(str).replace(/'/g, "''");
+}
+
+function generateDatabaseSQL(models, distDir) {
+  const sqlStatements = [];
+
+  // Schema - drop and recreate tables
+  sqlStatements.push(`-- Generated by build.js at ${new Date().toISOString()}
+DROP TABLE IF EXISTS models_fts;
+DROP TABLE IF EXISTS models;
+
+CREATE TABLE models (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  provider TEXT NOT NULL,
+  mode TEXT,
+  input_cost_per_token REAL,
+  output_cost_per_token REAL,
+  max_tokens INTEGER,
+  max_input_tokens INTEGER,
+  max_output_tokens INTEGER,
+  data_json TEXT NOT NULL
+);
+
+CREATE INDEX idx_models_slug ON models(slug);
+CREATE INDEX idx_models_provider ON models(provider);
+
+-- FTS5 with trigram tokenizer for fuzzy matching
+CREATE VIRTUAL TABLE models_fts USING fts5(
+  name,
+  slug,
+  provider,
+  content='models',
+  content_rowid='id',
+  tokenize='trigram'
+);
+`);
+
+  // Insert statements for each model
+  for (const [name, info] of models) {
+    const slug = slugify(name);
+    const provider = info.litellm_provider || extractProvider(name);
+    const mode = info.mode || null;
+
+    const values = [
+      `'${escapeSql(name)}'`,
+      `'${escapeSql(slug)}'`,
+      `'${escapeSql(provider)}'`,
+      mode ? `'${escapeSql(mode)}'` : 'NULL',
+      info.input_cost_per_token ?? 'NULL',
+      info.output_cost_per_token ?? 'NULL',
+      info.max_tokens ?? 'NULL',
+      info.max_input_tokens ?? 'NULL',
+      info.max_output_tokens ?? 'NULL',
+      `'${escapeSql(JSON.stringify(info))}'`
+    ].join(', ');
+
+    // Use INSERT OR IGNORE to skip duplicates (some model names slugify to the same value)
+    sqlStatements.push(`INSERT OR IGNORE INTO models (name, slug, provider, mode, input_cost_per_token, output_cost_per_token, max_tokens, max_input_tokens, max_output_tokens, data_json) VALUES (${values});`);
+  }
+
+  // Rebuild the FTS index
+  sqlStatements.push(`
+-- Rebuild FTS index
+INSERT INTO models_fts(models_fts) VALUES('rebuild');
+`);
+
+  fs.writeFileSync(path.join(distDir, 'seed.sql'), sqlStatements.join('\n'));
+  console.log('  - Generated seed.sql for D1');
 }
 
 async function build() {
@@ -1081,6 +1332,9 @@ async function build() {
   fs.mkdirSync(path.join(DIST_DIR, 'about'), { recursive: true });
   fs.writeFileSync(path.join(DIST_DIR, 'about', 'index.html'), generateAboutPageHTML(modelIndex.length, providerCount, buildDate));
 
+  // Write 404 page (static HTML that fetches suggestions client-side)
+  fs.writeFileSync(path.join(DIST_DIR, '404.html'), generate404PageHTML());
+
   // Write Cloudflare headers config
   fs.writeFileSync(path.join(DIST_DIR, '_headers'), `/api/*
   Content-Type: application/json
@@ -1112,6 +1366,9 @@ ${sitemapUrls}
 </urlset>
 `);
 
+  // Generate D1 database seed file
+  generateDatabaseSQL(models, DIST_DIR);
+
   // Write hash file
   fs.writeFileSync('.last-build-hash', hash);
 
@@ -1120,6 +1377,8 @@ ${sitemapUrls}
   console.log(`  - ${models.length} API endpoints`);
   console.log(`  - 1 index page`);
   console.log(`  - 1 about page`);
+  console.log(`  - 1 404 page`);
+  console.log(`  - 1 seed.sql for D1`);
   console.log(`Output: ${DIST_DIR}/`);
 }
 
